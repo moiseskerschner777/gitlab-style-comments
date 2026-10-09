@@ -60,7 +60,12 @@ object TerminalPasteWatcher {
     private val logger = Logger.getInstance(TerminalPasteWatcher::class.java)
 
     private const val POLL_INTERVAL_MS = 500L
-    private const val MAX_ATTEMPTS = 240 // give up after ~2 minutes per phase
+    // 2 minutes was too short for the real workflow — batching several comments across files
+    // before finally pasting easily takes longer, and once this expires there was no way to
+    // retry short of adding another comment (confirmed via idea.log: "gave up waiting" with no
+    // error, just a timeout). 30 minutes per phase, plus ShowPendingCommentsAction now has a
+    // manual "I already pasted this" fallback for anything longer.
+    private const val MAX_ATTEMPTS = 3600 // give up after ~30 minutes per phase
     private const val PASTE_PLACEHOLDER_MARKER = "Pasted text"
 
     private enum class Phase { AWAITING_PASTE, AWAITING_SUBMIT }

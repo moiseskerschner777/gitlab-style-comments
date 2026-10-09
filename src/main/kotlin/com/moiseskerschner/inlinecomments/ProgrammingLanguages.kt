@@ -14,11 +14,16 @@ object ProgrammingLanguages {
         "c", "h", "cpp", "cc", "cxx", "hpp", "hh",
         "cs", "php", "dart", "lua",
         "sh", "bash", "zsh", "ps1",
-        "sql", "pl", "pm", "r"
+        "sql", "pl", "pm", "r",
+        "html", "htm", "css", "scss", "sass", "less"
     )
 
     fun isProgrammingLanguageFile(vFile: VirtualFile?): Boolean {
-        val extension = vFile?.extension?.lowercase() ?: return false
+        // Diff/Commit viewer panes don't always populate CommonDataKeys.VIRTUAL_FILE the way a
+        // normal editor tab does — when we can't determine the file type, don't block (the core
+        // "select text in a diff pane" use case must keep working); only block when we positively
+        // know the extension and it's not in the allow-list.
+        val extension = vFile?.extension?.lowercase() ?: return true
         return extension in EXTENSIONS
     }
 }
