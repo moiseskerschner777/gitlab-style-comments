@@ -22,7 +22,7 @@
                 text="Show Pending Inline Comments" description="Review every comment added since the last paste, across all files"
                 icon="AllIcons.Actions.Preview">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <add-to-group group-id="MainToolbar" anchor="last"/>
+            <add-to-group group-id="MainToolbarRight" anchor="first"/>
         </action>
     </actions>
 </idea-plugin>
