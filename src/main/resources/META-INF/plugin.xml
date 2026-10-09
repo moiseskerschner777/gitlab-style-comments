@@ -1,0 +1,21 @@
+<idea-plugin>
+    <id>com.moiseskerschner.inlinecomments</id>
+    <name>Inline Review Comments</name>
+    <vendor>Moises Kerschner</vendor>
+    <description>Select text in any editor — including the Git/Commit diff viewer panes — and press Ctrl+Shift+X to attach a review-style comment, the way GitLab's diff "add comment" works. Entirely local, on top of the built-in editor; nothing is sent anywhere.</description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <editorFactoryListener implementation="com.moiseskerschner.inlinecomments.InlineCommentEditorFactoryListener"/>
+        <editorNotificationProvider implementation="com.moiseskerschner.inlinecomments.CommentBarProvider"/>
+    </extensions>
+
+    <actions>
+        <action id="InlineComments.AddComment" class="com.moiseskerschner.inlinecomments.AddInlineCommentAction"
+                text="Add Inline Comment" description="Add a review-style comment for the selected text">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift X"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
