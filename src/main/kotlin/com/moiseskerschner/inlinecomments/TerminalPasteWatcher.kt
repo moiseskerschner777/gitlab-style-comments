@@ -30,6 +30,7 @@ object TerminalPasteWatcher {
 
     private var phase = Phase.AWAITING_PASTE
     private var matchedModel: WeakReference<TerminalOutputModel>? = null
+    private var matchedText: String? = null
     private var pasteLine: TerminalLineIndex? = null
     private var baselines: Map<Editor, TerminalOffset> = emptyMap()
 
@@ -70,6 +71,7 @@ object TerminalPasteWatcher {
         lastPayload = null
         onSubmitted = null
         matchedModel = null
+        matchedText = null
         pasteLine = null
         baselines = emptyMap()
     }
@@ -100,6 +102,7 @@ object TerminalPasteWatcher {
     }
 
     private fun pollAwaitingPaste(project: Project, payload: String) {
+        var foundText: String? = null
         val model = EditorFactory.getInstance().allEditors.firstNotNullOfOrNull { editor ->
             try {
                 val candidate = editor.getUserData(TerminalOutputModel.KEY) ?: return@firstNotNullOfOrNull null
@@ -110,8 +113,17 @@ object TerminalPasteWatcher {
                     else -> rawBaseline
                 }
                 val delta = candidate.getText(safeBaseline, candidate.endOffset)
-                val matched = delta.contains(payload) || delta.contains(PASTE_PLACEHOLDER_MARKER, ignoreCase = true)
-                if (matched) candidate else null
+                when {
+                    delta.contains(payload) -> {
+                        foundText = payload
+                        candidate
+                    }
+                    delta.contains(PASTE_PLACEHOLDER_MARKER, ignoreCase = true) -> {
+                        foundText = PASTE_PLACEHOLDER_MARKER
+                        candidate
+                    }
+                    else -> null
+                }
             } catch (t: Throwable) {
                 logger.warn("TerminalPasteWatcher: failed to read TerminalOutputModel for one editor, skipping it", t)
                 null
@@ -121,6 +133,7 @@ object TerminalPasteWatcher {
         if (model != null) {
             logger.info("TerminalPasteWatcher: payload pasted, waiting for it to be submitted (Enter)")
             matchedModel = WeakReference(model)
+            matchedText = foundText
             pasteLine = model.getLineByOffset(model.cursorOffset)
             phase = Phase.AWAITING_SUBMIT
             attemptsLeft = MAX_ATTEMPTS
@@ -161,6 +174,27 @@ object TerminalPasteWatcher {
         if (currentLine.compareTo(linePasted) > 0) {
             logger.info("TerminalPasteWatcher: Enter detected (cursor advanced past pasted line), firing onSubmitted")
             fireAndStop()
+            return
+        }
+
+        // Full-screen TUIs (e.g. Claude Code's CLI) redraw their input box in place instead of
+        // linearly scrolling to a new line on submit, so the cursor-line check above never fires
+        // for them (confirmed via idea.log: "payload pasted" logged, but no "Enter detected"
+        // ever followed, despite the user confirming they did submit). As a second, independent
+        // signal: once submitted, the pasted text/placeholder that was sitting in the input
+        // disappears (cleared, replaced by a spinner, etc.) — treat that as submission too.
+        val text = matchedText
+        if (text != null) {
+            val stillPresent = try {
+                model.getText(model.startOffset, model.endOffset).contains(text, ignoreCase = true)
+            } catch (t: Throwable) {
+                logger.warn("TerminalPasteWatcher: failed to re-check pasted text presence", t)
+                true
+            }
+            if (!stillPresent) {
+                logger.info("TerminalPasteWatcher: pasted text disappeared from input (submitted), firing onSubmitted")
+                fireAndStop()
+            }
         }
     }
 

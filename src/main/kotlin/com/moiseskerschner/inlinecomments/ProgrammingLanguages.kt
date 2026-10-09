@@ -11,7 +11,8 @@ object ProgrammingLanguages {
         "cs", "php", "dart", "lua",
         "sh", "bash", "zsh", "ps1",
         "sql", "pl", "pm", "r",
-        "html", "htm", "css", "scss", "sass", "less"
+        "html", "htm", "css", "scss", "sass", "less",
+        "json"
     )
 
     fun isProgrammingLanguageFile(vFile: VirtualFile?): Boolean {

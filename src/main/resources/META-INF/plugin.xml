@@ -10,6 +10,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <editorFactoryListener implementation="com.moiseskerschner.inlinecomments.InlineCommentEditorFactoryListener"/>
         <editorNotificationProvider implementation="com.moiseskerschner.inlinecomments.CommentBarProvider"/>
+        <postStartupActivity implementation="com.moiseskerschner.inlinecomments.ForceTerminalOverrideShortcuts"/>
     </extensions>
 
     <actions>
