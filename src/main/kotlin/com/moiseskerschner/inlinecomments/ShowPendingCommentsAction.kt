@@ -13,18 +13,6 @@ import java.awt.FlowLayout
 import javax.swing.JButton
 import javax.swing.JPanel
 
-/**
- * Shows every comment currently batched (added since the last paste+submit into a terminal,
- * across all files — see CommentBatch) in a scrollable, read-only popup, so it can be read over
- * carefully before pasting instead of only trusting the clipboard blindly.
- *
- * Also offers a manual "Clear" fallback: TerminalPasteWatcher's auto-detection only polls for a
- * bounded window after each copy (see its MAX_ATTEMPTS) — if the real paste+Enter happens after
- * that window closes (confirmed via idea.log: "gave up waiting" after the timeout, with no
- * errors — the batch was just never actually detected as submitted), there was previously no way
- * to retry short of adding another comment to restart the watch. This button lets the user
- * confirm "I already pasted this into Claude Code" directly, bypassing detection entirely.
- */
 class ShowPendingCommentsAction : AnAction() {
 
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT

@@ -38,14 +38,6 @@ import javax.swing.JPanel
 import javax.swing.KeyStroke
 import javax.swing.SwingConstants
 
-/**
- * An inline, in-editor comment box anchored right under a line — reverse-engineered from
- * JetBrains' own bundled GitLab plugin (org.jetbrains.plugins.gitlab...DiffInlayComponentsFactory
- * and the shared com.intellij.collaboration.ui.codereview.comment.* classes it delegates to) so
- * the measurements, colors and structure match the real "add comment" widget, without depending
- * on that internal/Ultimate-only module: rounded card (arc 10, tearline-colored 1px border,
- * editor background), icon + input row (COMPACT inset 6/10), hint + accent submit button row.
- */
 object InlineCommentWidget {
 
     private const val CARD_ARC = 10
@@ -67,8 +59,6 @@ object InlineCommentWidget {
         var inlay: com.intellij.openapi.editor.Inlay<*>? = null
         fun dismiss() {
             val toDispose = inlay ?: return
-            // Deferred: disposing the inlay synchronously from inside its own button/key
-            // handler tears down the component the event is still dispatching on.
             ApplicationManager.getApplication().invokeLater {
                 if (!Disposer.isDisposed(toDispose)) {
                     Disposer.dispose(toDispose)
@@ -96,10 +86,6 @@ object InlineCommentWidget {
             override fun actionPerformed(e: ActionEvent?) = doSubmit()
         }
 
-        // Enter submits, Escape cancels — registered as real IntelliJ action shortcuts scoped
-        // to textArea (not plain Swing JComponent input-map bindings) so they take priority
-        // over global editor actions, e.g. the built-in "close tab" Escape handler that was
-        // otherwise winning and closing the whole file instead of just this widget.
         object : AnAction() {
             override fun actionPerformed(e: AnActionEvent) = doSubmit()
         }.registerCustomShortcutSet(CommonShortcuts.ENTER, textArea)
@@ -108,7 +94,6 @@ object InlineCommentWidget {
             override fun actionPerformed(e: AnActionEvent) = dismiss()
         }.registerCustomShortcutSet(CommonShortcuts.ESCAPE, textArea)
 
-        // Shift+Enter still inserts a literal newline.
         textArea.inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK), "insert-newline")
         textArea.actionMap.put("insert-newline", object : AbstractAction() {
             override fun actionPerformed(e: ActionEvent?) {
@@ -174,9 +159,6 @@ object InlineCommentWidget {
         card.border = RoundedLineBorder(borderColor, CARD_ARC)
         card.add(content, BorderLayout.CENTER)
 
-        // No decorative gutter icon for this transient widget itself — it would duplicate the
-        // persistent per-comment balloon icon (GutterIconsRefresher) when editing an existing
-        // comment, since that one stays visible on the commented line the whole time.
         val noIcon = com.intellij.util.ui.EmptyIcon.ICON_0
         val gutterIcon = object : GutterIconRenderer() {
             override fun getIcon() = noIcon
