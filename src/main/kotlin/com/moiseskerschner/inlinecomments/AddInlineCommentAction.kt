@@ -8,11 +8,6 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.ide.CopyPasteManager
 import java.awt.datatransfer.StringSelection
 
-/**
- * Select text in any editor (including Git diff / Commit tool window panes) and press
- * Ctrl+Shift+X to attach a review-style inline comment to that selection, the way
- * GitLab's diff "add comment" works — but entirely local, on top of the built-in editor.
- */
 class AddInlineCommentAction : AnAction() {
 
     private val logger = Logger.getInstance(AddInlineCommentAction::class.java)
