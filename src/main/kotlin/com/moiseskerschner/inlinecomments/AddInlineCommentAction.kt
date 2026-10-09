@@ -21,7 +21,10 @@ class AddInlineCommentAction : AnAction() {
 
     override fun update(e: AnActionEvent) {
         val editor = e.getData(CommonDataKeys.EDITOR)
-        e.presentation.isEnabledAndVisible = editor != null && editor.selectionModel.hasSelection()
+        val vFile = e.getData(CommonDataKeys.VIRTUAL_FILE)
+        e.presentation.isEnabledAndVisible = editor != null &&
+            editor.selectionModel.hasSelection() &&
+            ProgrammingLanguages.isProgrammingLanguageFile(vFile)
     }
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -45,10 +48,10 @@ class AddInlineCommentAction : AnAction() {
 
                 val project = editor.project
                 if (vFile != null && project != null) {
-                    val displayPath = CommentFormatter.getRelativePath(project, vFile)
-                    val formatted = CommentFormatter.format(displayPath, vFile.name, manager.getComments())
+                    CommentBatch.touch(vFile, document)
+                    val formatted = CommentBatch.format(project)
                     CopyPasteManager.getInstance().setContents(StringSelection(formatted))
-                    TerminalPasteWatcher.recordCopy(document, formatted, project)
+                    TerminalPasteWatcher.recordCopy(formatted, project) { CommentBatch.clearAll() }
                 }
             }
         )
