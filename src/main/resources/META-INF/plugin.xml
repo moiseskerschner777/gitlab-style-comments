@@ -18,5 +18,11 @@
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift X"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
+        <action id="InlineComments.ShowPendingComments" class="com.moiseskerschner.inlinecomments.ShowPendingCommentsAction"
+                text="Show Pending Inline Comments" description="Review every comment added since the last paste, across all files"
+                icon="AllIcons.Actions.Preview">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <add-to-group group-id="MainToolbar" anchor="last"/>
+        </action>
     </actions>
 </idea-plugin>
