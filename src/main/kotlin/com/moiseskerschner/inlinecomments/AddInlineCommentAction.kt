@@ -48,6 +48,7 @@ class AddInlineCommentAction : AnAction() {
                     val displayPath = CommentFormatter.getRelativePath(project, vFile)
                     val formatted = CommentFormatter.format(displayPath, vFile.name, manager.getComments())
                     CopyPasteManager.getInstance().setContents(StringSelection(formatted))
+                    TerminalPasteWatcher.recordCopy(document, formatted, project)
                 }
             }
         )
