@@ -26,8 +26,7 @@ class CommentBarPanel(
     fileName: String,
     comments: List<InlineComment>,
     project: Project,
-    onRemoveComment: (String) -> Unit,
-    onClearAll: () -> Unit
+    onRemoveComment: (String) -> Unit
 ) : JPanel() {
     init {
         val text = if (count == 1) "1 comment stacked" else "$count comments stacked"
@@ -44,14 +43,6 @@ class CommentBarPanel(
             CopyPasteManager.getInstance().setContents(StringSelection(formatted))
         }
         add(copyBtn)
-        val clearBtn = JButton(AllIcons.Actions.Close)
-        clearBtn.preferredSize = Dimension(24, 24)
-        clearBtn.foreground = Color(0xFF, 0x9E, 0x64)
-        clearBtn.margin = java.awt.Insets(0, 0, 0, 0)
-        clearBtn.isBorderPainted = false
-        clearBtn.isContentAreaFilled = false
-        clearBtn.addActionListener { onClearAll() }
-        add(clearBtn)
     }
 
     private fun showPreview(

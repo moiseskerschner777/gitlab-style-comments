@@ -22,12 +22,8 @@ class CommentBarProvider : EditorNotificationProvider {
         if (count == 0) return null
         return Function<FileEditor, JComponent> { fileEditor ->
             val displayPath = CommentFormatter.getRelativePath(project, file)
-            CommentBarPanel(count, displayPath, file.name, manager.getComments(), project, { id ->
+            CommentBarPanel(count, displayPath, file.name, manager.getComments(), project) { id ->
                 manager.removeComment(id)
-                (fileEditor as? TextEditor)?.editor?.let { GutterIconsRefresher.refresh(it) }
-                EditorNotifications.getInstance(project).updateAllNotifications()
-            }) {
-                manager.clearAll()
                 (fileEditor as? TextEditor)?.editor?.let { GutterIconsRefresher.refresh(it) }
                 EditorNotifications.getInstance(project).updateAllNotifications()
             }

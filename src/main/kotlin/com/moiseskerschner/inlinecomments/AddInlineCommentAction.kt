@@ -4,13 +4,10 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.ide.CopyPasteManager
 import java.awt.datatransfer.StringSelection
 
 class AddInlineCommentAction : AnAction() {
-
-    private val logger = Logger.getInstance(AddInlineCommentAction::class.java)
 
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
 
@@ -38,7 +35,7 @@ class AddInlineCommentAction : AnAction() {
             onSubmit = { request ->
                 val manager = CommentManager.getInstance(document)
                 val comment = manager.addComment(editor, request)
-                logger.info("line ${comment.lineNumber}: \"${comment.snippet}\" — ${comment.request}")
+                PluginLog.info("AddInlineCommentAction", "line ${comment.lineNumber}: \"${comment.snippet}\" — ${comment.request}")
                 GutterIconsRefresher.refresh(editor)
 
                 val project = editor.project

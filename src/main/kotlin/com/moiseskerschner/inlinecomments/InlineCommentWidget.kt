@@ -41,6 +41,7 @@ import javax.swing.SwingConstants
 object InlineCommentWidget {
 
     private const val CARD_ARC = 10
+    private const val CARD_WIDTH = 620
 
     fun show(
         editor: Editor,
@@ -172,7 +173,7 @@ object InlineCommentWidget {
             true,
             false,
             false,
-            true,
+            false,
             0,
             anchorOffset
         )
@@ -189,6 +190,8 @@ object InlineCommentWidget {
         init {
             isOpaque = false
         }
+
+        override fun getPreferredSize() = java.awt.Dimension(JBUI.scale(CARD_WIDTH), super.getPreferredSize().height)
 
         override fun paintComponent(g: Graphics) {
             val g2 = g.create() as Graphics2D

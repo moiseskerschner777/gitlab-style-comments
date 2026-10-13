@@ -11,6 +11,8 @@
         <editorFactoryListener implementation="com.moiseskerschner.inlinecomments.InlineCommentEditorFactoryListener"/>
         <editorNotificationProvider implementation="com.moiseskerschner.inlinecomments.CommentBarProvider"/>
         <postStartupActivity implementation="com.moiseskerschner.inlinecomments.ForceTerminalOverrideShortcuts"/>
+        <toolWindow id="Inline Comments Log" anchor="bottom" secondary="true"
+                    factoryClass="com.moiseskerschner.inlinecomments.PluginLogToolWindowFactory"/>
     </extensions>
 
     <actions>
@@ -18,12 +20,6 @@
                 text="Add Inline Comment" description="Add a review-style comment for the selected text">
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift X"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-        </action>
-        <action id="InlineComments.ShowPendingComments" class="com.moiseskerschner.inlinecomments.ShowPendingCommentsAction"
-                text="Show Pending Inline Comments" description="Review every comment added since the last paste, across all files"
-                icon="AllIcons.Actions.Preview">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <add-to-group group-id="MainToolbarRight" anchor="first"/>
         </action>
     </actions>
 </idea-plugin>

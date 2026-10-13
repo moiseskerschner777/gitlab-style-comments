@@ -1,7 +1,6 @@
 package com.moiseskerschner.inlinecomments
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
@@ -15,7 +14,7 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
 object TerminalPasteWatcher {
-    private val logger = Logger.getInstance(TerminalPasteWatcher::class.java)
+    private const val TAG = "TerminalPasteWatcher"
 
     private const val POLL_INTERVAL_MS = 500L
     private const val MAX_ATTEMPTS = 3600
@@ -42,7 +41,7 @@ object TerminalPasteWatcher {
         matchedModel = null
         pasteLine = null
         baselines = snapshotBaselines()
-        logger.info("TerminalPasteWatcher: recorded copy (${payload.length} chars), polling terminals")
+        PluginLog.info(TAG, "recorded copy (${payload.length} chars), polling terminals")
 
         pollTask?.cancel(false)
         pollTask = AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay(
@@ -60,7 +59,7 @@ object TerminalPasteWatcher {
                 editor to model.endOffset
             }.toMap()
         } catch (t: Throwable) {
-            logger.warn("TerminalPasteWatcher: failed to snapshot terminal baselines", t)
+            PluginLog.warn(TAG, "failed to snapshot terminal baselines", t)
             emptyMap()
         }
     }
@@ -83,7 +82,7 @@ object TerminalPasteWatcher {
             return
         }
         if (attemptsLeft-- <= 0) {
-            logger.info("TerminalPasteWatcher: gave up waiting (phase=$phase)")
+            PluginLog.info(TAG, "gave up waiting (phase=$phase)")
             stopPolling()
             return
         }
@@ -125,13 +124,13 @@ object TerminalPasteWatcher {
                     else -> null
                 }
             } catch (t: Throwable) {
-                logger.warn("TerminalPasteWatcher: failed to read TerminalOutputModel for one editor, skipping it", t)
+                PluginLog.warn(TAG, "failed to read TerminalOutputModel for one editor, skipping it", t)
                 null
             }
         }
 
         if (model != null) {
-            logger.info("TerminalPasteWatcher: payload pasted, waiting for it to be submitted (Enter)")
+            PluginLog.info(TAG, "payload pasted, waiting for it to be submitted (Enter)")
             matchedModel = WeakReference(model)
             matchedText = foundText
             pasteLine = model.getLineByOffset(model.cursorOffset)
@@ -145,12 +144,12 @@ object TerminalPasteWatcher {
                 widget.text?.contains(payload) == true
             }
         } catch (t: Throwable) {
-            logger.warn("TerminalPasteWatcher: failed to read terminal widgets", t)
+            PluginLog.warn(TAG, "failed to read terminal widgets", t)
             false
         }
 
         if (foundViaClassicWidget) {
-            logger.info("TerminalPasteWatcher: payload found via classic terminal widget, firing onSubmitted (no submit-detection on this engine)")
+            PluginLog.info(TAG, "payload found via classic terminal widget, firing onSubmitted (no submit-detection on this engine)")
             fireAndStop()
         }
     }
@@ -159,7 +158,7 @@ object TerminalPasteWatcher {
         val model = matchedModel?.get()
         val linePasted = pasteLine
         if (model == null || linePasted == null) {
-            logger.info("TerminalPasteWatcher: lost terminal model while awaiting submit, giving up")
+            PluginLog.info(TAG, "lost terminal model while awaiting submit, giving up")
             stopPolling()
             return
         }
@@ -167,12 +166,12 @@ object TerminalPasteWatcher {
         val currentLine = try {
             model.getLineByOffset(model.cursorOffset)
         } catch (t: Throwable) {
-            logger.warn("TerminalPasteWatcher: failed to read cursor position", t)
+            PluginLog.warn(TAG, "failed to read cursor position", t)
             return
         }
 
         if (currentLine.compareTo(linePasted) > 0) {
-            logger.info("TerminalPasteWatcher: Enter detected (cursor advanced past pasted line), firing onSubmitted")
+            PluginLog.info(TAG, "Enter detected (cursor advanced past pasted line), firing onSubmitted")
             fireAndStop()
             return
         }
@@ -188,11 +187,11 @@ object TerminalPasteWatcher {
             val stillPresent = try {
                 model.getText(model.startOffset, model.endOffset).contains(text, ignoreCase = true)
             } catch (t: Throwable) {
-                logger.warn("TerminalPasteWatcher: failed to re-check pasted text presence", t)
+                PluginLog.warn(TAG, "failed to re-check pasted text presence", t)
                 true
             }
             if (!stillPresent) {
-                logger.info("TerminalPasteWatcher: pasted text disappeared from input (submitted), firing onSubmitted")
+                PluginLog.info(TAG, "pasted text disappeared from input (submitted), firing onSubmitted")
                 fireAndStop()
             }
         }
