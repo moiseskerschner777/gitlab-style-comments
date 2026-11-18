@@ -1,13 +1,13 @@
 package com.moiseskerschner.inlinecomments
 
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 
 object CommentFormatter {
-    fun getRelativePath(project: Project, vf: VirtualFile): String = runReadAction {
+    fun getRelativePath(project: Project, vf: VirtualFile): String = runReadActionBlocking {
         val contentRoot = ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(vf)
         if (contentRoot != null) {
             VfsUtilCore.getRelativePath(vf, contentRoot) ?: vf.name

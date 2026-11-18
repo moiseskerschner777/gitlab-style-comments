@@ -12,7 +12,7 @@ object ProgrammingLanguages {
         "sh", "bash", "zsh", "ps1",
         "sql", "pl", "pm", "r",
         "html", "htm", "css", "scss", "sass", "less",
-        "json"
+        "json", "md"
     )
 
     fun isProgrammingLanguageFile(vFile: VirtualFile?): Boolean {

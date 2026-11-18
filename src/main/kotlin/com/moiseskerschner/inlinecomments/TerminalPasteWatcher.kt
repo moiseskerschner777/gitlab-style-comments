@@ -4,8 +4,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
+import com.intellij.terminal.frontend.toolwindow.TerminalToolWindowTabsManager
 import com.intellij.util.concurrency.AppExecutorUtil
-import org.jetbrains.plugins.terminal.TerminalView
 import org.jetbrains.plugins.terminal.view.TerminalLineIndex
 import org.jetbrains.plugins.terminal.view.TerminalOffset
 import org.jetbrains.plugins.terminal.view.TerminalOutputModel
@@ -139,17 +139,20 @@ object TerminalPasteWatcher {
             return
         }
 
-        val foundViaClassicWidget = try {
-            TerminalView.getInstance(project).getWidgets().any { widget ->
-                widget.text?.contains(payload) == true
+        val foundViaTabs = try {
+            TerminalToolWindowTabsManager.getInstance(project).tabs.any { tab ->
+                val models = tab.view.outputModels
+                listOf(models.regular, models.alternative).any { m ->
+                    m.getText(m.startOffset, m.endOffset).contains(payload)
+                }
             }
         } catch (t: Throwable) {
-            PluginLog.warn(TAG, "failed to read terminal widgets", t)
+            PluginLog.warn(TAG, "failed to read terminal tabs", t)
             false
         }
 
-        if (foundViaClassicWidget) {
-            PluginLog.info(TAG, "payload found via classic terminal widget, firing onSubmitted (no submit-detection on this engine)")
+        if (foundViaTabs) {
+            PluginLog.info(TAG, "payload found via terminal tabs, firing onSubmitted (no submit-detection on this path)")
             fireAndStop()
         }
     }

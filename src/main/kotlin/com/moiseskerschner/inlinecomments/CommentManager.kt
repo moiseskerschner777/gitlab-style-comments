@@ -1,6 +1,6 @@
 package com.moiseskerschner.inlinecomments
 
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.RangeMarker
@@ -36,7 +36,7 @@ class CommentManager {
         return comment
     }
 
-    fun getComments(): List<InlineComment> = runReadAction {
+    fun getComments(): List<InlineComment> = runReadActionBlocking {
         comments.mapIndexed { index, comment ->
             val marker = markers[index]
             if (!marker.isValid) {

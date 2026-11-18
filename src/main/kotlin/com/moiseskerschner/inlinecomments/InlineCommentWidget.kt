@@ -61,9 +61,7 @@ object InlineCommentWidget {
         fun dismiss() {
             val toDispose = inlay ?: return
             ApplicationManager.getApplication().invokeLater {
-                if (!Disposer.isDisposed(toDispose)) {
-                    Disposer.dispose(toDispose)
-                }
+                Disposer.dispose(toDispose)
             }
         }
 
