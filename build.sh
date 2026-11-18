@@ -7,4 +7,6 @@ cd "$(dirname "$0")"
 
 echo
 echo "Plugin built:"
-ls -1 build/distributions/*.zip
+for zip in "$PWD"/build/distributions/*.zip; do
+    echo "$zip"
+done
