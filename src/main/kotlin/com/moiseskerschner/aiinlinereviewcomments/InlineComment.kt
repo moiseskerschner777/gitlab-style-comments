@@ -1,4 +1,4 @@
-package com.moiseskerschner.inlinecomments
+package com.moiseskerschner.aiinlinereviewcomments
 
 data class InlineComment(
     val id: String,

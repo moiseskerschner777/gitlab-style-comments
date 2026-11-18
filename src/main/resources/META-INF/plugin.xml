@@ -1,22 +1,24 @@
 <idea-plugin>
-    <id>com.moiseskerschner.inlinecomments</id>
-    <name>Inline Review Comments</name>
+    <id>com.moiseskerschner.aiinlinereviewcomments</id>
+    <name>AI Inline Review Comments</name>
     <vendor>Moises Kerschner</vendor>
     <description>Select text in any editor — including the Git/Commit diff viewer panes — and press Ctrl+Shift+X to attach a review-style comment, the way GitLab's diff "add comment" works. Entirely local, on top of the built-in editor; nothing is sent anywhere.</description>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.terminal</depends>
+    <depends>com.intellij.modules.jcef</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <editorFactoryListener implementation="com.moiseskerschner.inlinecomments.InlineCommentEditorFactoryListener"/>
-        <editorNotificationProvider implementation="com.moiseskerschner.inlinecomments.CommentBarProvider"/>
-        <postStartupActivity implementation="com.moiseskerschner.inlinecomments.ForceTerminalOverrideShortcuts"/>
+        <editorFactoryListener implementation="com.moiseskerschner.aiinlinereviewcomments.InlineCommentEditorFactoryListener"/>
+        <editorNotificationProvider implementation="com.moiseskerschner.aiinlinereviewcomments.CommentBarProvider"/>
+        <postStartupActivity implementation="com.moiseskerschner.aiinlinereviewcomments.ForceTerminalOverrideShortcuts"/>
+        <postStartupActivity implementation="com.moiseskerschner.aiinlinereviewcomments.PreviewShortcutDispatcher"/>
         <toolWindow id="Inline Comments Log" anchor="bottom" secondary="true"
-                    factoryClass="com.moiseskerschner.inlinecomments.PluginLogToolWindowFactory"/>
+                    factoryClass="com.moiseskerschner.aiinlinereviewcomments.PluginLogToolWindowFactory"/>
     </extensions>
 
     <actions>
-        <action id="InlineComments.AddComment" class="com.moiseskerschner.inlinecomments.AddInlineCommentAction"
+        <action id="InlineComments.AddComment" class="com.moiseskerschner.aiinlinereviewcomments.AddInlineCommentAction"
                 text="Add Inline Comment" description="Add a review-style comment for the selected text">
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift X"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>

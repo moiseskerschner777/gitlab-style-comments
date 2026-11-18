@@ -1,4 +1,4 @@
-package com.moiseskerschner.inlinecomments
+package com.moiseskerschner.aiinlinereviewcomments
 
 import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.openapi.editor.Document

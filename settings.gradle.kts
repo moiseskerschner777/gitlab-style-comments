@@ -1,1 +1,1 @@
-rootProject.name = "gitlab-style-comments"
+rootProject.name = "ai-inline-review-comments"

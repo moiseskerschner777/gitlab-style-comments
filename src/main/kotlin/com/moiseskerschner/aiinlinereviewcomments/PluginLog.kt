@@ -1,4 +1,4 @@
-package com.moiseskerschner.inlinecomments
+package com.moiseskerschner.aiinlinereviewcomments
 
 import com.intellij.openapi.diagnostic.Logger
 import java.time.LocalTime
@@ -13,12 +13,12 @@ object PluginLog {
     private val listeners = mutableListOf<(Entry) -> Unit>()
 
     fun info(tag: String, message: String) {
-        Logger.getInstance("com.moiseskerschner.inlinecomments.$tag").info(message)
+        Logger.getInstance("com.moiseskerschner.aiinlinereviewcomments.$tag").info(message)
         record("INFO", tag, message)
     }
 
     fun warn(tag: String, message: String, t: Throwable? = null) {
-        Logger.getInstance("com.moiseskerschner.inlinecomments.$tag").warn(message, t)
+        Logger.getInstance("com.moiseskerschner.aiinlinereviewcomments.$tag").warn(message, t)
         record("WARN", tag, if (t != null) "$message (${t.javaClass.simpleName}: ${t.message})" else message)
     }
 

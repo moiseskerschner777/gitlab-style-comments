@@ -1,4 +1,4 @@
-package com.moiseskerschner.inlinecomments
+package com.moiseskerschner.aiinlinereviewcomments
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken

@@ -1,10 +1,11 @@
-package com.moiseskerschner.inlinecomments
+package com.moiseskerschner.aiinlinereviewcomments
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.ui.EditorNotifications
 import com.intellij.util.ui.JBUI
 import java.awt.Color
 import java.awt.Component
@@ -43,6 +44,14 @@ class CommentBarPanel(
             CopyPasteManager.getInstance().setContents(StringSelection(formatted))
         }
         add(copyBtn)
+        val clearBtn = JButton("Clear all")
+        clearBtn.addActionListener {
+            TerminalPasteWatcher.cancel()
+            CommentBatch.clearAll()
+            EditorNotifications.getInstance(project).updateAllNotifications()
+            PluginLog.info("CommentBarPanel", "cleared all stacked comments")
+        }
+        add(clearBtn)
     }
 
     private fun showPreview(

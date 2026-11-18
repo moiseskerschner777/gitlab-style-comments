@@ -1,4 +1,4 @@
-package com.moiseskerschner.inlinecomments
+package com.moiseskerschner.aiinlinereviewcomments
 
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.EditorFactory
@@ -22,6 +22,19 @@ object CommentBatch {
             }
             .joinToString("\n\n")
     }
+
+    data class Item(val vFile: VirtualFile, val document: Document, val comment: InlineComment)
+
+    fun items(): List<Item> = touched.entries.flatMap { (vFile, document) ->
+        CommentManager.getInstance(document).getComments().map { Item(vFile, document, it) }
+    }
+
+    fun remove(item: Item) {
+        CommentManager.getInstance(item.document).removeComment(item.comment.id)
+        EditorFactory.getInstance().getEditors(item.document).forEach { GutterIconsRefresher.refresh(it) }
+    }
+
+    fun count(): Int = touched.values.sumOf { CommentManager.getInstance(it).getComments().size }
 
     fun clearAll() {
         touched.clear()

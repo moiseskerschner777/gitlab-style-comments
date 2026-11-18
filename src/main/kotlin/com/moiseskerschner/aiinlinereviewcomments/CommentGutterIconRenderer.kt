@@ -1,4 +1,4 @@
-package com.moiseskerschner.inlinecomments
+package com.moiseskerschner.aiinlinereviewcomments
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction

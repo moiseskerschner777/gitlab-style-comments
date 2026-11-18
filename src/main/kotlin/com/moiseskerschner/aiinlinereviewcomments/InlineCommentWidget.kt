@@ -1,4 +1,4 @@
-package com.moiseskerschner.inlinecomments
+package com.moiseskerschner.aiinlinereviewcomments
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.ui.laf.darcula.ui.DarculaButtonUI
@@ -43,27 +43,18 @@ object InlineCommentWidget {
     private const val CARD_ARC = 10
     private const val CARD_WIDTH = 620
 
-    fun show(
-        editor: Editor,
-        anchorOffset: Int,
+    class CardParts(val card: JPanel, val textArea: JBTextArea)
+
+    fun buildCard(
         initialText: String,
         submitLabel: String,
         onSubmit: (String) -> Unit,
-        onDelete: (() -> Unit)? = null
-    ) {
-        val editorEx = editor as? EditorEx ?: return
-
+        onDelete: (() -> Unit)?,
+        dismiss: () -> Unit
+    ): CardParts {
         val scheme = EditorColorsManager.getInstance().globalScheme
         val borderColor = scheme.getColor(EditorColors.TEARLINE_COLOR) ?: JBColor.border()
         val cardBackground = scheme.defaultBackground
-
-        var inlay: com.intellij.openapi.editor.Inlay<*>? = null
-        fun dismiss() {
-            val toDispose = inlay ?: return
-            ApplicationManager.getApplication().invokeLater {
-                Disposer.dispose(toDispose)
-            }
-        }
 
         val textArea = JBTextArea(initialText)
         textArea.rows = 1
@@ -157,6 +148,30 @@ object InlineCommentWidget {
         card.layout = BorderLayout()
         card.border = RoundedLineBorder(borderColor, CARD_ARC)
         card.add(content, BorderLayout.CENTER)
+        return CardParts(card, textArea)
+    }
+
+    fun show(
+        editor: Editor,
+        anchorOffset: Int,
+        initialText: String,
+        submitLabel: String,
+        onSubmit: (String) -> Unit,
+        onDelete: (() -> Unit)? = null
+    ) {
+        val editorEx = editor as? EditorEx ?: return
+
+        var inlay: com.intellij.openapi.editor.Inlay<*>? = null
+        fun dismiss() {
+            val toDispose = inlay ?: return
+            ApplicationManager.getApplication().invokeLater {
+                Disposer.dispose(toDispose)
+            }
+        }
+
+        val parts = buildCard(initialText, submitLabel, onSubmit, onDelete, ::dismiss)
+        val card = parts.card
+        val textArea = parts.textArea
 
         val noIcon = com.intellij.util.ui.EmptyIcon.ICON_0
         val gutterIcon = object : GutterIconRenderer() {

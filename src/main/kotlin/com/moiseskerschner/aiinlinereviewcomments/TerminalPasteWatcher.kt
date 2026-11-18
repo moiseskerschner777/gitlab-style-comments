@@ -1,4 +1,4 @@
-package com.moiseskerschner.inlinecomments
+package com.moiseskerschner.aiinlinereviewcomments
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
@@ -63,6 +63,8 @@ object TerminalPasteWatcher {
             emptyMap()
         }
     }
+
+    fun cancel() = stopPolling()
 
     private fun stopPolling() {
         pollTask?.cancel(false)
