@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonShortcuts
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.ex.EditorEx
@@ -194,8 +195,30 @@ object InlineCommentWidget {
         inlay = EditorEmbeddedComponentManager.getInstance().addComponent(editorEx, card, properties)
 
         ApplicationManager.getApplication().invokeLater {
+            scrollIntoView(editor, inlay, anchorOffset)
             textArea.requestFocusInWindow()
             textArea.caretPosition = textArea.text.length
+        }
+    }
+
+    /**
+     * The card hangs below the anchor line, which for a multi-line selection is the last
+     * selected line and may sit below the viewport. Scroll just enough to reveal the whole card.
+     */
+    private fun scrollIntoView(editor: Editor, inlay: com.intellij.openapi.editor.Inlay<*>?, anchorOffset: Int) {
+        val scrolling = editor.scrollingModel
+        val bounds = inlay?.takeIf { it.isValid }?.bounds
+        if (bounds == null) {
+            scrolling.scrollTo(editor.offsetToLogicalPosition(anchorOffset), ScrollType.MAKE_VISIBLE)
+            return
+        }
+        val visible = scrolling.visibleArea
+        val margin = editor.lineHeight
+        val top = bounds.y - margin
+        val bottom = bounds.y + bounds.height + margin
+        when {
+            bottom > visible.y + visible.height -> scrolling.scrollVertically(maxOf(0, bottom - visible.height))
+            top < visible.y -> scrolling.scrollVertically(maxOf(0, top))
         }
     }
 
