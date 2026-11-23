@@ -92,6 +92,27 @@ object InlineCommentWidget {
             }
         })
 
+        textArea.inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "indent-four-spaces")
+        textArea.actionMap.put("indent-four-spaces", object : AbstractAction() {
+            override fun actionPerformed(e: ActionEvent?) {
+                textArea.replaceSelection("    ")
+            }
+        })
+
+        textArea.inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK), "outdent-four-spaces")
+        textArea.actionMap.put("outdent-four-spaces", object : AbstractAction() {
+            override fun actionPerformed(e: ActionEvent?) {
+                val position = textArea.caretPosition
+                val lineStart = textArea.text.lastIndexOf('\n', position - 1) + 1
+                val prefix = textArea.text.substring(lineStart, position)
+                val remove = minOf(prefix.count { it == ' ' }, 4)
+                if (remove > 0) {
+                    textArea.select(lineStart, lineStart + remove)
+                    textArea.replaceSelection("")
+                }
+            }
+        })
+
         val avatarLabel = JBLabel(AllIcons.General.User)
         avatarLabel.verticalAlignment = SwingConstants.TOP
         avatarLabel.border = JBUI.Borders.emptyRight(10)

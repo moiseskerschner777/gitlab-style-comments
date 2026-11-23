@@ -2,10 +2,10 @@
     <id>com.moiseskerschner.aiinlinereviewcomments</id>
     <name>AI Inline Review Comments</name>
     <vendor>Moises Kerschner</vendor>
-    <description>Select text in any editor — including the Git/Commit diff viewer panes — and press Ctrl+Shift+X to attach a review-style comment, the way GitLab's diff "add comment" works. Entirely local, on top of the built-in editor; nothing is sent anywhere.</description>
+    <description>Select text in any editor — including the Git/Commit diff viewer panes — and press Ctrl+Shift+X to attach a review-style comment, the way GitLab's diff "add comment" works. Entirely local: the formatted comments are sent to the IDE terminal tab running Claude Code (a tab whose title contains "claude"), or copied to the clipboard when no such tab is open.</description>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>org.jetbrains.plugins.terminal</depends>
+    <depends optional="true">org.jetbrains.plugins.terminal</depends>
     <depends>com.intellij.modules.jcef</depends>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -13,6 +13,7 @@
         <editorNotificationProvider implementation="com.moiseskerschner.aiinlinereviewcomments.CommentBarProvider"/>
         <postStartupActivity implementation="com.moiseskerschner.aiinlinereviewcomments.ForceTerminalOverrideShortcuts"/>
         <postStartupActivity implementation="com.moiseskerschner.aiinlinereviewcomments.PreviewShortcutDispatcher"/>
+        <notificationGroup id="ai-inline-review-comments" displayType="BALLOON"/>
         <toolWindow id="Inline Comments Log" anchor="bottom" secondary="true"
                     factoryClass="com.moiseskerschner.aiinlinereviewcomments.PluginLogToolWindowFactory"/>
     </extensions>

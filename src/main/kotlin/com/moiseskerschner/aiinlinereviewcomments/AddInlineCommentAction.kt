@@ -11,6 +11,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.ui.EditorNotifications
 import java.awt.datatransfer.StringSelection
 
 class AddInlineCommentAction : AnAction() {
@@ -104,7 +105,13 @@ class AddInlineCommentAction : AnAction() {
                 CommentBatch.touch(vFile, document)
                 val formatted = CommentBatch.format(project)
                 CopyPasteManager.getInstance().setContents(StringSelection(formatted))
-                TerminalPasteWatcher.recordCopy(formatted, project) { CommentBatch.clearAll() }
+                if (ClaudeTerminalSender.isTerminalPluginInstalled() && ClaudeTerminalSender.send(project, formatted, submit = true)) {
+                    TerminalPasteWatcher.cancel()
+                    CommentBatch.clearAll()
+                    EditorNotifications.getInstance(project).updateAllNotifications()
+                } else if (ClaudeTerminalSender.isTerminalPluginInstalled()) {
+                    TerminalPasteWatcher.recordCopy(formatted, project) { CommentBatch.clearAll() }
+                }
             }
         }
     }
