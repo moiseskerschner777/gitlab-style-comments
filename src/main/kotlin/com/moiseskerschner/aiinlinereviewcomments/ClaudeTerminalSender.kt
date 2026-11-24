@@ -13,6 +13,7 @@ object ClaudeTerminalSender {
     private const val TERMINAL_PLUGIN_ID = "org.jetbrains.plugins.terminal"
     private const val TERMINAL_TOOL_WINDOW_ID = "Terminal"
     private const val TAG = "ClaudeTerminalSender"
+    private const val CLAUDE_CODE_TITLE_GLYPHS = "✳✶✻✽✢·⠂⠐"
 
     /** Terminal tabs whose title contains this text (case-insensitive) are treated as a Claude Code session. */
     const val DEFAULT_TAB_NAME = "claude"
@@ -45,7 +46,14 @@ object ClaudeTerminalSender {
 
     private fun tabTitleMatches(tabTitle: String?, terminalTabName: String): Boolean {
         if (tabTitle == null) return false
-        return tabTitle.contains(terminalTabName, ignoreCase = true)
+        if (tabTitle.contains(terminalTabName, ignoreCase = true)) return true
+        return terminalTabName == DEFAULT_TAB_NAME && startsWithClaudeCodeGlyph(tabTitle)
+    }
+
+    /** Claude Code renames its tab to the current task, prefixed by a status glyph, once a session starts. */
+    private fun startsWithClaudeCodeGlyph(tabTitle: String): Boolean {
+        val first = tabTitle.trimStart().firstOrNull() ?: return false
+        return first in CLAUDE_CODE_TITLE_GLYPHS
     }
 
     private fun notifyTabNotFound(project: Project, terminalTabName: String) {
