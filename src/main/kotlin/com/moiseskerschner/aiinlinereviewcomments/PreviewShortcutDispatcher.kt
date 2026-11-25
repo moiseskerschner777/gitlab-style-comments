@@ -8,6 +8,7 @@ import java.awt.KeyEventDispatcher
 import java.awt.KeyboardFocusManager
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
+import javax.swing.SwingUtilities
 
 class PreviewShortcutDispatcher : ProjectActivity {
 
@@ -34,6 +35,11 @@ class PreviewShortcutDispatcher : ProjectActivity {
                     val browser = JBCefBrowserBase.getFocusedBrowser()
                     PluginLog.info(TAG, "Ctrl+Shift+X seen, focusedBrowser=${browser != null}")
                     if (browser == null) return@KeyEventDispatcher false
+                    val focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().focusOwner
+                    if (focusOwner == null || !SwingUtilities.isDescendingFrom(focusOwner, browser.component)) {
+                        PluginLog.info(TAG, "focused browser is stale (focus is elsewhere), leaving to the action")
+                        return@KeyEventDispatcher false
+                    }
                     val project = ProjectManager.getInstance().openProjects.firstOrNull { PreviewSelection.findSplitEditor(it) != null }
                         ?: return@KeyEventDispatcher false
                     AddInlineCommentAction.runPreviewFlow(project)
